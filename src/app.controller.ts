@@ -50,7 +50,8 @@ export class AppController {
   @Post('users')
   async create(@Body() count: number, @Headers() headers) {
     if (headers['app'] === SECRET) {
-      await this.appService.create(count);
+      const result = await this.appService.create(count);
+      return result;
     }
   }
 }
