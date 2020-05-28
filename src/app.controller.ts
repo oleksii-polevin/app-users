@@ -43,9 +43,9 @@ export class AppController {
   }
 
   /**
-   * 
-   * @param createUserDto 
-   * @param headers 
+   * Create new user 
+   * @param count Count
+   * @param headers http-headers
    */
   @Post('users')
   async create(@Body() count: number, @Headers() headers) {
