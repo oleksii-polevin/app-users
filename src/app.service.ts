@@ -2,15 +2,15 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { IUser } from './interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
+// import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class AppService {
   constructor(@InjectModel('User') private userModel: Model<IUser>) {}
 
-  async create(createUserDto: CreateUserDto): Promise<IUser> {
-    const createdUser = new this.userModel(createUserDto);
-    return createdUser.save();
+  async create(count: number): Promise<IUser> {
+    const createdUser = await new this.userModel(count).save();
+    return createdUser;
   }
 
   async findAll(): Promise<IUser[]> {
@@ -18,18 +18,14 @@ export class AppService {
   }
 
   async findOne(userId): Promise<IUser> {
-    return this.userModel.findOne({ userId });
+    return this.userModel.findById(userId).exec();
   }
 
-  async updateOrCreate(userId, count) {
-    const user = await this.findOne(userId);
+  async updateOrCreate(userId: string, count) {
+    const user = await this.userModel.findById(userId);
     if (user) {
-      const filter = { userId };
-      const update = { count }
-      return this.userModel.findOneAndUpdate(filter, update, {
-        new: true
-      })
+      return this.userModel.findOneAndUpdate({_id: userId }, count);
     }
-    this.create({ userId, count })
+    this.create(count);
   }
 }

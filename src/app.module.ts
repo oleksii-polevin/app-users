@@ -10,6 +10,7 @@ import { UserSchema } from './schemas/user.schema';
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
   }),
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
   ],

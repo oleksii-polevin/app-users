@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Param, Headers, Body, Put } from '@nestjs/common';
 import { AppService } from './app.service';
 import { IUser } from './interfaces/user.interface';
-import { CreateUserDto } from './dto/create-user.dto';
+
+const SECRET = 'INSERT HERE';
 
 @Controller()
 export class AppController {
@@ -12,18 +13,21 @@ export class AppController {
    * @param id UserId
    * @param headers Http Headers
    */
-  @Get('user/:id')
-  async update(@Param('id') id: string, @Headers() headers) {
-    return this.appService.updateOrCreate(id, headers['count']);
-
+  @Put('user/:id')
+  async update(@Param('id') id: string, @Headers() headers, @Body() count) {
+    if (headers['app'] === SECRET) {
+    return this.appService.updateOrCreate(id, count);
+    }
   }
 
   /**
    * Shows all users
    */
   @Get('users')
-  async findAll(): Promise<IUser[]> {
-    return this.appService.findAll();
+  async findAll(@Headers() headers): Promise<IUser[]> {
+    if (headers['api'] === SECRET) {
+      return this.appService.findAll();
+    }
   }
 
   /**
@@ -31,20 +35,22 @@ export class AppController {
    * @param id userUd
    */
   @Get('users/:id')
-  async findOne(@Param('id') id: string): Promise<IUser> {
-    return this.appService.findOne(id);
-  }
-
-  @Post('users')
-  async create(@Headers() headers) {
-    const userId = headers['userid'];
-    const count = headers['count'];
-    console.log(headers)
-    const createUserDto: CreateUserDto = {
-      userId,
-      count,
+  async findOne(@Param('id') id: string, @Headers() headers): Promise<IUser> {
+    if (headers['app'] === SECRET) {
+      return this.appService.findOne(id);
     }
-    await this.appService.create(createUserDto);
+    
   }
 
+  /**
+   * 
+   * @param createUserDto 
+   * @param headers 
+   */
+  @Post('users')
+  async create(@Body() count: number, @Headers() headers) {
+    if (headers['app'] === SECRET) {
+      await this.appService.create(count);
+    }
+  }
 }
